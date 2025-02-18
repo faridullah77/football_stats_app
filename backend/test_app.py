@@ -1,4 +1,4 @@
-import pytest //pip installed
+import pytest 
 from app import app
 
 @pytest.fixture
