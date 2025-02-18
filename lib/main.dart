@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(FootballStatsApp());
@@ -17,7 +19,31 @@ class FootballStatsApp extends StatelessWidget {
   }
 }
 
-class FootballStatsHomePage extends StatelessWidget {
+class FootballStatsHomePage extends StatefulWidget {
+  @override
+  _FootballStatsHomePageState createState() => _FootballStatsHomePageState();
+}
+
+class _FootballStatsHomePageState extends State<FootballStatsHomePage> {
+  Map<String, dynamic> _stats = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStats();
+  }
+
+  Future<void> _fetchStats() async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:5000/api/stats'));
+    if (response.statusCode == 200) {
+      setState(() {
+        _stats = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load stats');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,17 +60,18 @@ class FootballStatsHomePage extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            Text('Match 1: Team A 2 - 1 Team B'),
-            Text('Match 2: Team C 0 - 0 Team D'),
+            if (_stats['live_scores'] != null)
+              for (var match in _stats['live_scores'])
+                Text('${match['match']}: ${match['score']}'),
             SizedBox(height: 32),
             Text(
               'Top Players',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            Text('1. Player X - 10 Goals'),
-            Text('2. Player Y - 8 Goals'),
-            Text('3. Player Z - 7 Goals'),
+            if (_stats['top_players'] != null)
+              for (var player in _stats['top_players'])
+                Text('${player['name']} - ${player['goals']} Goals'),
           ],
         ),
       ),
