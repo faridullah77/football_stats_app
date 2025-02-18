@@ -21,12 +21,18 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Ensure pip is installed
+        run: python -m ensurepip --upgrade
+
       - name: Install Python dependencies
         run: |
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest
+
+      - name: Check Python version
+        run: python --version
 
       - name: Run Python tests
         run: |
@@ -37,6 +43,9 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+
+      - name: Check Flutter version
+        run: flutter --version
 
       - name: Install Flutter dependencies
         run: flutter pub get
